@@ -8,13 +8,15 @@ import (
 
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("session")
+		token, err := r.Cookie("token")
 		if err != nil {
 			http.Redirect(w, r, "/login", http.StatusUnauthorized)
 			return
 		}
 
-		_ = cookie
+		// проверить токен получить пользака
+
+		_ = token
 		ctx := context.WithValue(r.Context(), "user",
 			models.User{
 				Name: "chebureki",
