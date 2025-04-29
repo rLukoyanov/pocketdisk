@@ -7,6 +7,7 @@ import (
 	"os"
 	"pocketdisk/internal/db"
 	"pocketdisk/internal/handlers"
+	"pocketdisk/internal/middleware"
 )
 
 //go:embed templates/*
@@ -30,7 +31,8 @@ func serve() {
 
 	h := handlers.Handlers{TemplateFS: templateFS}
 
-	http.HandleFunc("/", h.Render)
+	http.HandleFunc("/", middleware.AuthMiddleware(h.Dashboard))
+	http.HandleFunc("/login", h.Login)
 	http.ListenAndServe(":8080", nil)
 }
 
