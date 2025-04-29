@@ -5,12 +5,11 @@ import (
 	"os/signal"
 	"pocketdisk/internal/config"
 	"pocketdisk/internal/db"
-	"pocketdisk/internal/handlers"
 	"pocketdisk/internal/pkg"
+	"pocketdisk/internal/routes"
 	"syscall"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
 )
 
@@ -30,20 +29,12 @@ func main() {
 		logrus.Error(err)
 		panic(err)
 	}
-	_ = sqlite
 
 	e := echo.New()
-
 	pkg.AddNewRender(e)
+	routes.InitRoutes(e, sqlite, cfg)
 
-	renderHandlers := handlers.RenderHandlers{Cfg: cfg}
-	// apiHandlers := handlers.ApiHandlers{Cfg: cfg}
-	e.Use(middleware.Logger())
-
-	e.GET("/", renderHandlers.DashboardPage)
-	e.GET("/login", renderHandlers.LoginPage)
 	e.Start(":8080")
-
 	logrus.Info("Сервер запущен")
 
 	signal.Notify(done, os.Interrupt, syscall.SIGTERM)

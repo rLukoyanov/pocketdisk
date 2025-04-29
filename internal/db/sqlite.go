@@ -14,6 +14,7 @@ func InitDB() (*sql.DB, error) {
 		log.Fatal(err)
 		return nil, err
 	}
+
 	query := `
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
