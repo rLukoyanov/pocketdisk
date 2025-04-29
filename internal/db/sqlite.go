@@ -18,9 +18,10 @@ func InitDB() (*sql.DB, error) {
 	query := `
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		username TEXT UNIQUE,
+		email TEXT,
 		password TEXT,
-		is_admin BOOLEAN DEFAULT FALSE
+		is_admin BOOLEAN DEFAULT FALSE,
+		CHECK (email LIKE '%_@_%._%')
 	);
 	
 	CREATE TABLE IF NOT EXISTS files (
@@ -40,8 +41,8 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("admin123"), bcrypt.DefaultCost)
-	db.Exec("INSERT OR IGNORE INTO users (username, password, is_admin) VALUES (?, ?, ?)",
-		"admin", hashedPassword, true)
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("123"), bcrypt.DefaultCost)
+	db.Exec("INSERT OR IGNORE INTO users (email, password, is_admin) VALUES (?, ?, ?)",
+		"admin@test.com", hashedPassword, true)
 	return db, nil
 }

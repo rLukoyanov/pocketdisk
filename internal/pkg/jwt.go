@@ -6,16 +6,18 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/sirupsen/logrus"
 )
 
-func GenerateJWT(cfg *config.Config, user_id, role string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, jwt.MapClaims{
-		"user_id": user_id,
-		"role":    role,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(), // 1 день
+func GenerateJWT(cfg *config.Config, userID, role string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"userID": userID,
+		"role":   role,
+		"exp":    time.Now().Add(time.Hour * 24).Unix(), // 1 день
 	})
 
-	return token.SignedString(cfg.SECRET)
+	logrus.Info(cfg.SECRET)
+	return token.SignedString([]byte(cfg.SECRET))
 }
 
 func GetJWTClaims(cfg *config.Config, token string) (jwt.Claims, error) {

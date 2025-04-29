@@ -6,6 +6,7 @@ import (
 	"pocketdisk/internal/models"
 
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 type RenderHandlers struct {
@@ -18,11 +19,27 @@ func (h *RenderHandlers) DashboardPage(c echo.Context) error {
 		c.Redirect(http.StatusUnauthorized, "/login")
 	}
 
+	logrus.Info(data)
+
 	return c.Render(http.StatusOK, "index.html", data)
 }
 
+type LoginPageData struct {
+	Title             string
+	Error             string
+	Email             string
+	Action            string
+	ForgotPasswordURL string
+	RegisterURL       string
+}
+
 func (h *RenderHandlers) LoginPage(c echo.Context) error {
-	data := map[string]any{"Error": "Хуй login"}
+	data := LoginPageData{
+		Title:             "Вход",
+		Action:            "/api/login",
+		ForgotPasswordURL: "/forgot-password",
+		RegisterURL:       "/register",
+	}
 
 	return c.Render(http.StatusOK, "login.html", data)
 }

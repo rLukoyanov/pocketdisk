@@ -1,75 +1,135 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Вход</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        margin: 0;
-        padding: 0;
-        background-color: #f5f5f5;
-        color: #333;
-      }
-
-      .container {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 20px;
-        background: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .error {
-        color: red;
-        margin-bottom: 15px;
-      }
-
-      input,
-      button {
-        padding: 8px;
-        margin: 5px 0;
-      }
-
-      button {
-        background: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-
-      button:hover {
-        background: #0056b3;
-      }
-
-      a {
-        color: #007bff;
-        text-decoration: none;
-        margin-right: 10px;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-    </style>
+    <script src="static/tailwind.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            animation: {
+              "fade-in": "fadeIn 0.4s ease-out",
+              "fade-in-slow": "fadeIn 0.8s ease-out",
+            },
+            keyframes: {
+              fadeIn: {
+                "0%": { opacity: "0", transform: "translateY(8px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
-    <div class="container">
-      <h1>Вход</h1>
-      <form method="POST">
-        <input type="text" name="username" placeholder="логин" required />
-        <input
-          type="password"
-          name="password"
-          placeholder="пароль"
-          required
-        />
-        <button type="submit">Войти</button>
+  <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-xs animate-fade-in-slow">
+      <div class="text-center mb-8 animate-fade-in">
+        <h1 class="text-1xl font-light text-gray-800">PocketDisk</h1>
+        <h1 class="text-2xl font-light text-gray-800">{{.Title}}</h1>
+      </div>
+
+      <form id="login-form" class="space-y-6">
+        {{if .Error}}
+        <div
+          class="text-sm text-red-600 px-3 py-2 border border-red-200 bg-red-50 rounded animate-fade-in"
+        >
+          {{.Error}}
+        </div>
+        {{end}}
+
+        <div class="space-y-4">
+          <div>
+            <input
+              type="email"
+              name="email"
+              value="{{.Email}}"
+              class="w-full px-3 py-2 border-b border-gray-300 bg-transparent focus:outline-none focus:border-black transition-colors duration-300 placeholder-gray-400"
+              placeholder="Email"
+              required
+            />
+          </div>
+
+          <div>
+            <input
+              type="password"
+              name="password"
+              class="w-full px-3 py-2 border-b border-gray-300 bg-transparent focus:outline-none focus:border-black transition-colors duration-300 placeholder-gray-400"
+              placeholder="Пароль"
+              required
+            />
+          </div>
+        </div>
+        <p id="error-message"></p>
+        <div>
+          <button
+            type="submit"
+            class="w-full py-2 bg-black text-white hover:bg-gray-800 transition-colors duration-300"
+          >
+            Войти
+          </button>
+        </div>
       </form>
-      {{if .Error}}
-      <div class="error">{{.Error}}</div>
-      {{end}}
-      <p>Нет аккаунта? <a href="/register">Регистрация</a></p>
+
+      <!-- <div class="mt-6 text-center text-sm text-gray-500">
+        <a
+          href="{{.ForgotPasswordURL}}"
+          class="hover:text-gray-700 transition-colors duration-300"
+        >
+          Забыли пароль?
+        </a>
+        <span class="mx-2">•</span>
+        <a
+          href="{{.RegisterURL}}"
+          class="hover:text-gray-700 transition-colors duration-300"
+        >
+          Создать аккаунт
+        </a>
+      </div> -->
     </div>
+    <script>
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const form = e.target;
+          const formData = new FormData(form);
+          const errorElement = document.getElementById("error-message");
+          console.log(Object.fromEntries(formData), form, new FormData(form));
+          const submitButton = form.querySelector('button[type="submit"]');
+
+          submitButton.disabled = true;
+          submitButton.innerHTML =
+            '<i class="fa fa-spinner fa-spin"></i> Logging in...';
+
+          try {
+            const response = await fetch("/api/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(Object.fromEntries(formData)),
+              credentials: "include",
+            });
+
+            const data = await response.json();
+            console.log(data)
+            if (!response.ok) {
+              throw new Error(data.message || "Ошибка авторизации");
+            }
+
+            window.location.href = data.redirect || "/";
+          } catch (error) {
+            errorElement.innerText = error.message;
+            errorElement.style.display = "block";
+          } finally {
+            submitButton.disabled = false;
+            submitButton.innerText = "Войти";
+          }
+        });
+    </script>
   </body>
 </html>

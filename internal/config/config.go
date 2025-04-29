@@ -6,7 +6,7 @@ import (
 )
 
 type Config struct {
-	SECRET string `env:"SECRET" envDefault:"your_secret_key"`
+	SECRET string `env:"SECRET" envDefault:"yourSecretKey"`
 }
 
 func NewConfig() (*Config, error) {
