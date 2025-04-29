@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"pocketdisk/internal/db"
 	"pocketdisk/internal/handlers"
 )
 
@@ -12,9 +13,17 @@ import (
 var templateFS embed.FS
 
 func main() {
+	done := make(chan os.Signal, 1)
 
 	initFolders()
-	serve()
+	sqlite, err := db.InitDB()
+	if err != nil {
+		panic(err)
+	}
+	_ = sqlite
+	go serve()
+	log.Println("Сервер запущен")
+	<-done
 }
 
 func serve() {
