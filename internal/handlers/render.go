@@ -5,14 +5,16 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"pocketdisk/internal/config"
 	"pocketdisk/internal/models"
 )
 
-type Handlers struct {
+type RenderHandlers struct {
 	TemplateFS embed.FS
+	Cfg        *config.Config
 }
 
-func (h *Handlers) Dashboard(w http.ResponseWriter, r *http.Request) {
+func (h *RenderHandlers) DashboardPage(w http.ResponseWriter, r *http.Request) {
 	data, ok := r.Context().Value("user").(models.User)
 	if !ok {
 		http.Redirect(w, r, "/login", http.StatusUnauthorized)
@@ -31,10 +33,10 @@ func (h *Handlers) Dashboard(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handlers) Login(w http.ResponseWriter, r *http.Request) {
-	data := map[string]any{"Message": "Хуй login"}
+func (h *RenderHandlers) LoginPage(w http.ResponseWriter, r *http.Request) {
+	data := map[string]any{"Error": "Хуй login"}
 
-	t, err := template.ParseFS(h.TemplateFS, "templates/index.html")
+	t, err := template.ParseFS(h.TemplateFS, "templates/login.html")
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Ошибка рендера", http.StatusInternalServerError)
