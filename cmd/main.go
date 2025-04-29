@@ -1,7 +1,6 @@
 package main
 
 import (
-	"html/template"
 	"os"
 	"os/signal"
 	"pocketdisk/internal/config"
@@ -35,11 +34,7 @@ func main() {
 
 	e := echo.New()
 
-	template := &pkg.Template{
-		Templates: template.Must(template.ParseGlob("./templates/*.html")),
-	}
-
-	e.Renderer = template
+	pkg.AddNewRender(e)
 
 	renderHandlers := handlers.RenderHandlers{Cfg: cfg}
 	// apiHandlers := handlers.ApiHandlers{Cfg: cfg}
