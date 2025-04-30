@@ -1,5 +1,6 @@
 package models
 
-type User struct {
-	Name string
+type UserTokenInfo struct {
+	ID   string
+	Role string
 }

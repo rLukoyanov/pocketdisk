@@ -14,7 +14,7 @@ type RenderHandlers struct {
 }
 
 func (h *RenderHandlers) DashboardPage(c echo.Context) error {
-	data, ok := c.Request().Context().Value("user").(models.User)
+	data, ok := c.Get("user").(models.UserTokenInfo)
 	if !ok {
 		c.Redirect(http.StatusUnauthorized, "/login")
 	}

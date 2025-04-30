@@ -5,6 +5,7 @@ import (
 	"os/signal"
 	"pocketdisk/internal/config"
 	"pocketdisk/internal/db"
+	"pocketdisk/internal/logger"
 	"pocketdisk/internal/pkg"
 	"pocketdisk/internal/routes"
 	"syscall"
@@ -23,6 +24,7 @@ func main() {
 	}
 
 	initFolders()
+	logger.InitLogger()
 
 	sqlite, err := db.InitDB()
 	if err != nil {

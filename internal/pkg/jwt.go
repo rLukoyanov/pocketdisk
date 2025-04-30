@@ -20,7 +20,7 @@ func GenerateJWT(cfg *config.Config, userID, role string) (string, error) {
 	return token.SignedString([]byte(cfg.SECRET))
 }
 
-func GetJWTClaims(cfg *config.Config, token string) (jwt.Claims, error) {
+func GetJWTClaims(cfg *config.Config, token string) (jwt.MapClaims, error) {
 	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")

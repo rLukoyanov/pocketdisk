@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PocketDisk | Ваши файлы</title>
+    <link href="static/fontawesome/css/all.min.css" rel="stylesheet" />
     <script src="static/tailwind.js"></script>
     <script>
       tailwind.config = {
@@ -51,39 +52,45 @@
       .file-card {
         transition: all 0.3s ease;
       }
-      
+
       .file-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
       }
-      
+
       .file-icon {
         transition: all 0.3s ease;
       }
-      
+
       .file-card:hover .file-icon {
         transform: scale(1.1);
         animation: pulse-slow 2s infinite;
       }
-      
+
       .file-actions {
         opacity: 0;
         transform: translateX(10px);
         transition: all 0.3s ease;
       }
-      
+
       .file-card:hover .file-actions {
         opacity: 1;
         transform: translateX(0);
       }
-      
+
       .progress-bar {
         transition: width 0.6s ease;
       }
-      
+
       @keyframes pulse-slow {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
       }
     </style>
   </head>
@@ -167,6 +174,7 @@
           class="bg-white p-4 rounded border border-gray-200 hover:shadow-sm transition-shadow animate-fade-in-up"
           style="animation-delay: 0.2s"
         >
+        
           <div class="text-gray-500 text-sm">Файлы</div>
           <div class="text-xl mt-1">1,248</div>
         </div>
@@ -202,11 +210,17 @@
           class="grid grid-cols-12 gap-4 p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors file-card group"
         >
           <div class="col-span-6 flex items-center">
-            <i class="fas fa-folder text-yellow-400 mr-3 file-icon"></i>
-            <span class="group-hover:text-blue-600 transition-colors">Рабочие проекты</span>
+            <i class="fas fa-folder text-yellow-400 mr-3 file-icon"></i>  
+            <span class="group-hover:text-blue-600 transition-colors"
+              >Рабочие проекты</span
+            >
           </div>
           <div class="col-span-2 text-gray-500">-</div>
-          <div class="col-span-2 text-gray-500 group-hover:text-gray-700 transition-colors">2 дня назад</div>
+          <div
+            class="col-span-2 text-gray-500 group-hover:text-gray-700 transition-colors"
+          >
+            2 дня назад
+          </div>
           <div class="col-span-2 flex space-x-2 file-actions">
             <button class="text-gray-400 hover:text-blue-500 transition-colors">
               <i class="fas fa-share-alt"></i>
@@ -222,10 +236,16 @@
         >
           <div class="col-span-6 flex items-center">
             <i class="fas fa-file-pdf text-red-500 mr-3 file-icon"></i>
-            <span class="group-hover:text-blue-600 transition-colors">Отчет 2023.pdf</span>
+            <span class="group-hover:text-blue-600 transition-colors"
+              >Отчет 2023.pdf</span
+            >
           </div>
           <div class="col-span-2 text-gray-500">4.2 MB</div>
-          <div class="col-span-2 text-gray-500 group-hover:text-gray-700 transition-colors">5 часов назад</div>
+          <div
+            class="col-span-2 text-gray-500 group-hover:text-gray-700 transition-colors"
+          >
+            5 часов назад
+          </div>
           <div class="col-span-2 flex space-x-2 file-actions">
             <button class="text-gray-400 hover:text-blue-500 transition-colors">
               <i class="fas fa-share-alt"></i>

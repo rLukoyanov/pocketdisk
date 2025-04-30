@@ -17,7 +17,7 @@ type ApiHandlers struct {
 	DB  *sql.DB
 }
 
-const cookieName = "token"
+const CookieName = "token"
 
 func (h *ApiHandlers) Login(c echo.Context) error {
 	type LoginRequest struct {
@@ -26,7 +26,7 @@ func (h *ApiHandlers) Login(c echo.Context) error {
 	}
 
 	resetCookie := &http.Cookie{
-		Name:     cookieName,
+		Name:     CookieName,
 		HttpOnly: true,
 		MaxAge:   -1,
 	}
@@ -73,7 +73,7 @@ func (h *ApiHandlers) Login(c echo.Context) error {
 	}
 
 	c.SetCookie(&http.Cookie{
-		Name:     cookieName,
+		Name:     CookieName,
 		Value:    token,
 		HttpOnly: true,
 		Path:     "/",
