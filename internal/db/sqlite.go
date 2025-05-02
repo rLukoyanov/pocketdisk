@@ -18,9 +18,11 @@ func InitDB() (*sql.DB, error) {
 	query := `
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		email TEXT,
+		email TEXT UNIQUE,
 		password TEXT,
 		is_admin BOOLEAN DEFAULT FALSE,
+		storage_limit BIGINT DEFAULT 1073741824,
+		 storage_used BIGINT DEFAULT 0,
 		CHECK (email LIKE '%_@_%._%')
 	);
 	

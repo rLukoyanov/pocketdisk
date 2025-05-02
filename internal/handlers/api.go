@@ -2,8 +2,13 @@ package handlers
 
 import (
 	"database/sql"
+	"errors"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"pocketdisk/internal/config"
+	"pocketdisk/internal/models"
 	"pocketdisk/internal/pkg"
 	"time"
 
@@ -81,4 +86,47 @@ func (h *ApiHandlers) Login(c echo.Context) error {
 	})
 
 	return c.JSON(http.StatusOK, "authorized")
+}
+
+func (h *ApiHandlers) Upload(c echo.Context) error {
+	user, ok := c.Get("user").(models.UserTokenInfo)
+	if !ok {
+		logrus.Info("Cant get user")
+		return errors.New("cant get user")
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		logrus.Info(err)
+		return err
+	}
+
+	logrus.Infof("Upload file: %v, size: %v", file.Filename, file.Size)
+
+	src, err := file.Open()
+	if err != nil {
+		logrus.Info(err)
+		return err
+	}
+	defer src.Close()
+
+	dstPath := filepath.Join("./uploads", file.Filename)
+
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		logrus.Info(err)
+		return err
+	}
+	defer dst.Close()
+
+	if _, err = io.Copy(dst, src); err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"message":  "file created",
+		"filename": file.Filename,
+		"size":     file.Size,
+		"forUser":  user.ID,
+	})
 }

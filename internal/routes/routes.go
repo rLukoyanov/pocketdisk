@@ -15,7 +15,7 @@ func InitRoutes(e *echo.Echo, sqlite *sql.DB, cfg *config.Config) {
 	renderHandlers := handlers.RenderHandlers{Cfg: cfg}
 	apiHandlers := handlers.ApiHandlers{Cfg: cfg, DB: sqlite}
 
-	authMiddleware := custommiddleware.Middleware{Cfg: cfg}
+	authMiddleware := custommiddleware.AuthMiddleware{Cfg: cfg}
 
 	e.Use(middleware.Recover())
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -23,7 +23,7 @@ func InitRoutes(e *echo.Echo, sqlite *sql.DB, cfg *config.Config) {
 	}))
 
 	private := e.Group("/")
-	private.Use(authMiddleware.AuthMiddleware)
+	private.Use(authMiddleware.AuthMiddlewareRedirect)
 	private.GET("", renderHandlers.DashboardPage)
 
 	e.GET("/login", renderHandlers.LoginPage)
@@ -31,4 +31,7 @@ func InitRoutes(e *echo.Echo, sqlite *sql.DB, cfg *config.Config) {
 
 	api := e.Group("/api")
 	api.POST("/login", apiHandlers.Login)
+	api.POST("/upload", apiHandlers.Upload, authMiddleware.AuthMiddleware)
+
+	// logout
 }

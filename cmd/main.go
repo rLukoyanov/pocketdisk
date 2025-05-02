@@ -27,6 +27,7 @@ func main() {
 	logger.InitLogger()
 
 	sqlite, err := db.InitDB()
+
 	if err != nil {
 		logrus.Error(err)
 		panic(err)
@@ -44,7 +45,7 @@ func main() {
 }
 
 func initFolders() {
-	if err := os.Mkdir("uploads", 0600); os.IsNotExist(err) {
+	if err := os.Mkdir("uploads", 0777); os.IsNotExist(err) {
 		logrus.Error(err)
 	}
 }
