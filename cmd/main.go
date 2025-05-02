@@ -26,7 +26,7 @@ func main() {
 	initFolders()
 	logger.InitLogger()
 
-	sqlite, err := db.InitDB()
+	sqlite, err := db.InitDB(cfg)
 
 	if err != nil {
 		logrus.Error(err)

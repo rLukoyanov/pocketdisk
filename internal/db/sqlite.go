@@ -3,12 +3,13 @@ package db
 import (
 	"database/sql"
 	"log"
+	"pocketdisk/internal/config"
 
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func InitDB() (*sql.DB, error) {
+func InitDB(cfg *config.Config) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", "./cloud.db")
 	if err != nil {
 		log.Fatal(err)
@@ -22,7 +23,7 @@ func InitDB() (*sql.DB, error) {
 		password TEXT,
 		is_admin BOOLEAN DEFAULT FALSE,
 		storage_limit BIGINT DEFAULT 1073741824,
-		 storage_used BIGINT DEFAULT 0,
+		storage_used BIGINT DEFAULT 0,
 		CHECK (email LIKE '%_@_%._%')
 	);
 	
@@ -32,8 +33,6 @@ func InitDB() (*sql.DB, error) {
 		name TEXT,
 		path TEXT,
 		size INTEGER,
-		uploaded TEXT,
-		downloads INTEGER DEFAULT 0,
 		FOREIGN KEY(user_id) REFERENCES users(id)
 	);
 	`
@@ -43,7 +42,7 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("123"), bcrypt.DefaultCost)
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(cfg.SECRET), bcrypt.DefaultCost)
 	db.Exec("INSERT OR IGNORE INTO users (email, password, is_admin) VALUES (?, ?, ?)",
 		"admin@test.com", hashedPassword, true)
 	return db, nil
