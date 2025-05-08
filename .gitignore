@@ -1,2 +1,4 @@
 ./cloud.db
 cloud.db
+uploads
+*.db

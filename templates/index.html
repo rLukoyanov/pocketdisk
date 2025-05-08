@@ -35,66 +35,10 @@
       };
     </script>
     <style>
-      .notification-panel {
-        display: none;
-        opacity: 0;
-        transition: opacity 0.3s ease-out;
-      }
-
-      .notification-enter {
-        animation: fadeIn 0.3s ease-out forwards;
-      }
-
-      .notification-exit {
-        animation: fadeOut 0.3s ease-out forwards;
-      }
-
-      .file-card {
-        transition: all 0.3s ease;
-      }
-
-      .file-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-          0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      }
-
-      .file-icon {
-        transition: all 0.3s ease;
-      }
-
-      .file-card:hover .file-icon {
-        transform: scale(1.1);
-        animation: pulse-slow 2s infinite;
-      }
-
-      .file-actions {
-        opacity: 0;
-        transform: translateX(10px);
-        transition: all 0.3s ease;
-      }
-
-      .file-card:hover .file-actions {
-        opacity: 1;
-        transform: translateX(0);
-      }
-
-      .progress-bar {
-        transition: width 0.6s ease;
-      }
-
-      @keyframes pulse-slow {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
-      }
+      /* ... (оставьте существующие стили без изменений) ... */
     </style>
   </head>
-  <body class="bg-gray-50 text-gray-800 min-h-screen">
+  <body class="bg-gray-50 text-gray-800 min-h-screen" x-data="app()" x-init="init()">
     <nav
       class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between animate-fade-in"
     >
@@ -127,9 +71,22 @@
           </div>
         </div>
         <div
-          class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center"
+          class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center cursor-pointer relative"
+          @click="showUserMenu = !showUserMenu"
         >
-          <span class="text-sm">ИИ</span>
+          <span class="text-sm" x-text="userInitials"></span>
+          <div 
+            class="absolute right-6 top-12 mt-100 w-48 bg-white shadow-lg rounded-md py-1 z-50" 
+            x-show="showUserMenu"
+            @click.outside="showUserMenu = false"
+          >
+            <div class="px-4 py-2 border-b">
+              <p class="text-sm font-medium" x-text="userEmail"></p>
+            </div>
+            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Профиль</a>
+            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100">Настройки</a>
+            <a href="/api/logout" class="block px-4 py-2 text-sm hover:bg-gray-100 text-red-500">Выйти</a>
+          </div>
         </div>
       </div>
     </nav>
@@ -140,20 +97,15 @@
         <div class="flex space-x-3">
           <button
             class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+            @click="showUploadModal = true"
           >
             <i class="fas fa-upload mr-2"></i>Загрузить
-          </button>
-          <button
-            class="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 transition-colors"
-          >
-            <i class="fas fa-plus mr-2"></i>Создать
           </button>
         </div>
       </div>
 
       <div class="flex items-center text-sm mb-6 animate-slide-in">
         <a href="#" class="text-blue-500 hover:underline">Мой диск</a>
-        <span class="mx-2">/</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -162,36 +114,15 @@
           style="animation-delay: 0.1s"
         >
           <div class="text-gray-500 text-sm">Использовано</div>
-          <div class="text-xl mt-1">14.2 GB</div>
+          <div class="text-xl mt-1" x-text="formatBytes(storageUsed)"></div>
           <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
             <div
               class="bg-blue-500 h-2 rounded-full progress-bar"
-              style="width: 47%"
+              :style="'width: ' + storagePercentage + '%'"
             ></div>
           </div>
+          <div class="text-xs text-gray-500 mt-1" x-text="'из ' + formatBytes(storageLimit)"></div>
         </div>
-        <!-- <div
-          class="bg-white p-4 rounded border border-gray-200 hover:shadow-sm transition-shadow animate-fade-in-up"
-          style="animation-delay: 0.2s"
-        >
-        
-          <div class="text-gray-500 text-sm">Файлы</div>
-          <div class="text-xl mt-1">1,248</div>
-        </div>
-        <div
-          class="bg-white p-4 rounded border border-gray-200 hover:shadow-sm transition-shadow animate-fade-in-up"
-          style="animation-delay: 0.3s"
-        >
-          <div class="text-gray-500 text-sm">Папки</div>
-          <div class="text-xl mt-1">32</div>
-        </div>
-        <div
-          class="bg-white p-4 rounded border border-gray-200 hover:shadow-sm transition-shadow animate-fade-in-up"
-          style="animation-delay: 0.4s"
-        >
-          <div class="text-gray-500 text-sm">Общий доступ</div>
-          <div class="text-xl mt-1">17</div>
-        </div> -->
       </div>
 
       <div
@@ -206,88 +137,267 @@
           <div class="col-span-2">Действия</div>
         </div>
 
-        <!-- <div
-          class="grid grid-cols-12 gap-4 p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors file-card group"
-        >
-          <div class="col-span-6 flex items-center">
-            <i class="fas fa-folder text-yellow-400 mr-3 file-icon"></i>  
-            <span class="group-hover:text-blue-600 transition-colors"
-              >Рабочие проекты</span
-            >
-          </div>
-          <div class="col-span-2 text-gray-500">-</div>
+        <template x-for="file in files" :key="file.id">
           <div
-            class="col-span-2 text-gray-500 group-hover:text-gray-700 transition-colors"
+            class="grid grid-cols-12 gap-4 p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors file-card group"
           >
-            2 дня назад
+            <div class="col-span-6 flex items-center">
+              <i :class="getFileIcon(file.name) + ' mr-3 file-icon'"></i>
+              <span class="group-hover:text-blue-600 transition-colors" x-text="file.name"></span>
+            </div>
+            <div class="col-span-2 text-gray-500" x-text="formatBytes(file.size)"></div>
+            <div
+              class="col-span-2 text-gray-500 group-hover:text-gray-700 transition-colors"
+              x-text="formatDate(file.upload_date)"
+            ></div>
+            <div class="col-span-2 flex space-x-2 file-actions">
+              <button 
+                class="text-gray-400 hover:text-blue-500 transition-colors"
+                @click="downloadFile(file.id, file.original_name)"
+              >
+                <i class="fas fa-download"></i>
+              </button>
+              <button 
+                class="text-gray-400 hover:text-red-500 transition-colors"
+                @click="deleteFile(file.id)"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
           </div>
-          <div class="col-span-2 flex space-x-2 file-actions">
-            <button class="text-gray-400 hover:text-blue-500 transition-colors">
-              <i class="fas fa-share-alt"></i>
-            </button>
-            <button class="text-gray-400 hover:text-blue-500 transition-colors">
-              <i class="fas fa-ellipsis-v"></i>
-            </button>
-          </div>
-        </div> -->
+        </template>
 
-        <div
-          class="grid grid-cols-12 gap-4 p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors file-card group"
-        >
-          <div class="col-span-6 flex items-center">
-            <i class="fas fa-file-pdf text-red-500 mr-3 file-icon"></i>
-            <span class="group-hover:text-blue-600 transition-colors"
-              >Отчет 2023.pdf</span
-            >
-          </div>
-          <div class="col-span-2 text-gray-500">4.2 MB</div>
-          <div
-            class="col-span-2 text-gray-500 group-hover:text-gray-700 transition-colors"
+        <div x-show="files.length === 0" class="p-8 text-center text-gray-500">
+          <i class="fas fa-folder-open text-3xl mb-2"></i>
+          <p>У вас пока нет файлов</p>
+          <button
+            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            @click="showUploadModal = true"
           >
-            5 часов назад
-          </div>
-          <div class="col-span-2 flex space-x-2 file-actions">
-            <button class="text-gray-400 hover:text-blue-500 transition-colors">
-              <i class="fas fa-share-alt"></i>
-            </button>
-            <button class="text-gray-400 hover:text-blue-500 transition-colors">
-              <i class="fas fa-ellipsis-v"></i>
-            </button>
-          </div>
+            <i class="fas fa-upload mr-2"></i>Загрузить первый файл
+          </button>
         </div>
       </div>
 
-      <div
-        class="fixed bottom-0 right-0 mb-6 mr-6 w-64 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden hidden"
+      <!-- Модальное окно загрузки -->
+      <div 
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
+        x-show="showUploadModal"
+        @click.away="showUploadModal = false"
       >
-        <div class="p-4 border-b border-gray-200">
-          <div class="flex justify-between items-center">
-            <h3 class="font-medium">Загрузка файлов</h3>
-            <button class="text-gray-400 hover:text-gray-600">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </div>
-        <div class="p-4">
-          <div
-            class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
-          >
-            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
-            <p class="text-sm text-gray-500">Перетащите файлы сюда</p>
-          </div>
-          <div class="mt-4">
-            <div class="text-xs text-gray-500 mb-1">report.pdf (45%)</div>
-            <div class="w-full bg-gray-200 rounded-full h-1.5">
-              <div
-                class="bg-blue-500 h-1.5 rounded-full progress-bar"
-                style="width: 45%"
-              ></div>
+        <div class="bg-white rounded-lg w-full max-w-md mx-4">
+          <div class="p-4 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+              <h3 class="font-medium">Загрузка файлов</h3>
+              <button 
+                class="text-gray-400 hover:text-gray-600"
+                @click="showUploadModal = false"
+              >
+                <i class="fas fa-times"></i>
+              </button>
             </div>
+          </div>
+          <div class="p-4">
+            <form id="uploadForm" enctype="multipart/form-data">
+              <div
+                class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer"
+                @click="$refs.fileInput.click()"
+                @dragover.prevent="dragOver = true"
+                @dragleave="dragOver = false"
+                @drop.prevent="handleDrop($event)"
+                :class="{'border-blue-500 bg-blue-50': dragOver}"
+              >
+                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                <p class="text-sm text-gray-500" x-text="selectedFile ? selectedFile.name : 'Перетащите файлы сюда или кликните для выбора'"></p>
+                <input 
+                  type="file" 
+                  id="fileInput" 
+                  class="hidden" 
+                  @change="handleFileSelect($event)"
+                  ref="fileInput"
+                />
+              </div>
+              <button
+                type="button"
+                class="mt-4 w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                @click="uploadFile()"
+                :disabled="!selectedFile"
+                :class="{'opacity-50 cursor-not-allowed': !selectedFile}"
+              >
+                <i class="fas fa-upload mr-2"></i>Загрузить
+              </button>
+            </form>
           </div>
         </div>
       </div>
     </div>
 
     <script src="//unpkg.com/alpinejs" defer></script>
+    <script>
+      function app() {
+        return {
+          showUserMenu: false,
+          showUploadModal: false,
+          dragOver: false,
+          selectedFile: null,
+          userEmail: '',
+          userInitials: '',
+          storageUsed: 0,
+          storageLimit: 1073741824, // 1GB
+          storagePercentage: 0,
+          files: [],
+          
+          init() {
+            this.fetchUserData();
+            this.fetchFiles();
+          },
+          
+          fetchUserData() {
+            fetch('/api/me')
+              .then(response => response.json())
+              .then(data => {
+                data = data.user
+                this.userEmail = data.email;
+                this.userInitials = this.getInitials(data.email);
+                this.storageUsed = data.storageUsed;
+                this.storageLimit = data.storageLimit;
+                this.storagePercentage = ((data.storageUsed / data.storageLimit) * 100).toFixed(1);
+              })
+              .catch(error => {
+                console.error('Error fetching user data:', error);
+              });
+          },
+          
+          fetchFiles() {
+            fetch('/api/files')
+              .then(response => response.json())
+              .then(data => {
+                this.files = data.files || [];
+              })
+              .catch(error => {
+                console.error('Error fetching files:', error);
+              });
+          },
+          
+          getInitials(email) {
+            return email.split('@')[0].substring(0, 2).toUpperCase();
+          },
+          
+          formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+          },
+          
+          formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+          },
+          
+          getFileIcon(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const icons = {
+              pdf: 'fas fa-file-pdf text-red-500',
+              doc: 'fas fa-file-word text-blue-500',
+              docx: 'fas fa-file-word text-blue-500',
+              xls: 'fas fa-file-excel text-green-500',
+              xlsx: 'fas fa-file-excel text-green-500',
+              ppt: 'fas fa-file-powerpoint text-orange-500',
+              pptx: 'fas fa-file-powerpoint text-orange-500',
+              jpg: 'fas fa-file-image text-yellow-500',
+              jpeg: 'fas fa-file-image text-yellow-500',
+              png: 'fas fa-file-image text-yellow-500',
+              gif: 'fas fa-file-image text-yellow-500',
+              zip: 'fas fa-file-archive text-purple-500',
+              rar: 'fas fa-file-archive text-purple-500',
+              mp3: 'fas fa-file-audio text-pink-500',
+              mp4: 'fas fa-file-video text-indigo-500',
+              txt: 'fas fa-file-alt text-gray-500',
+              default: 'fas fa-file text-gray-400'
+            };
+            return icons[ext] || icons.default;
+          },
+          
+          handleFileSelect(event) {
+            this.selectedFile = event.target.files[0];
+          },
+          
+          handleDrop(event) {
+            this.dragOver = false;
+            this.selectedFile = event.dataTransfer.files[0];
+          },
+          
+          uploadFile() {
+            if (!this.selectedFile) return;
+            
+            const formData = new FormData();
+            formData.append('file', this.selectedFile);
+            
+            fetch('/api/upload', {
+              method: 'POST',
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              this.showUploadModal = false;
+              this.selectedFile = null;
+              this.fetchFiles();
+              this.fetchUserData();
+              this.showNotification('Файл успешно загружен', 'success');
+            })
+            .catch(error => {
+              console.error('Upload error:', error);
+              this.showNotification('Ошибка при загрузке файла', 'error');
+            });
+          },
+          
+          downloadFile(fileId, fileName) {
+            fetch(`/api/files/${fileId}`)
+              .then(response => response.blob())
+              .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+              })
+              .catch(error => {
+                console.error('Download error:', error);
+                this.showNotification('Ошибка при скачивании файла', 'error');
+              });
+          },
+          
+          deleteFile(fileId) {
+            if (!confirm('Вы уверены, что хотите удалить этот файл?')) return;
+            
+            fetch(`/api/files/${fileId}`, {
+              method: 'DELETE'
+            })
+            .then(response => {
+              if (response.ok) {
+                this.fetchFiles();
+                this.fetchUserData();
+                this.showNotification('Файл успешно удален', 'success');
+              } else {
+                throw new Error('Delete failed');
+              }
+            })
+            .catch(error => {
+              console.error('Delete error:', error);
+              this.showNotification('Ошибка при удалении файла', 'error');
+            });
+          },
+          
+          showNotification(message, type) {
+            alert(`${type === 'success' ? '✓' : '✗'} ${message}`);
+          }
+        };
+      }
+    </script>
   </body>
 </html>

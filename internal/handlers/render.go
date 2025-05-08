@@ -24,22 +24,6 @@ func (h *RenderHandlers) DashboardPage(c echo.Context) error {
 	return c.Render(http.StatusOK, "index.html", data)
 }
 
-type LoginPageData struct {
-	Title             string
-	Error             string
-	Email             string
-	Action            string
-	ForgotPasswordURL string
-	RegisterURL       string
-}
-
 func (h *RenderHandlers) LoginPage(c echo.Context) error {
-	data := LoginPageData{
-		Title:             "Вход",
-		Action:            "/api/login",
-		ForgotPasswordURL: "/forgot-password",
-		RegisterURL:       "/register",
-	}
-
-	return c.Render(http.StatusOK, "login.html", data)
+	return c.Render(http.StatusOK, "login.html", nil)
 }

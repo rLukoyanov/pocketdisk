@@ -19,6 +19,7 @@ func InitDB(cfg *config.Config) (*sql.DB, error) {
 	query := `
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT,
 		email TEXT UNIQUE,
 		password TEXT,
 		is_admin BOOLEAN DEFAULT FALSE,
@@ -33,6 +34,15 @@ func InitDB(cfg *config.Config) (*sql.DB, error) {
 		name TEXT,
 		path TEXT,
 		size INTEGER,
+		FOREIGN KEY(user_id) REFERENCES users(id)
+	);
+
+	CREATE TABLE IF NOT EXISTS user_settings (
+		user_id TEXT PRIMARY KEY,
+		email_enabled BOOLEAN DEFAULT TRUE,
+		notify_login BOOLEAN DEFAULT TRUE,
+		notify_storage BOOLEAN DEFAULT TRUE,
+		notify_updates BOOLEAN DEFAULT TRUE,
 		FOREIGN KEY(user_id) REFERENCES users(id)
 	);
 	`
